@@ -19,6 +19,7 @@
     "@angular/platform-browser": "~8.1.2",
     "@angular/platform-browser-dynamic": "~8.1.2",
     "@angular/router": "~8.1.2",
+    "@types/googlemaps": "^3.39.3",
     "bootstrap": "^4.4.1",
     "jquery": "^3.5.0",
     "rxjs": "~6.4.0",
