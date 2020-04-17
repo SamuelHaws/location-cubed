@@ -1,3 +1,18 @@
-<ul class="list-group">
-  <li class="list-group-item" *ngFor="let businessType of businessTypes">{{ businessType.descript }}</li>
-</ul>
+<form [formGroup]="form" (ngSubmit)="submit()">
+           
+  <div class="form-group">
+    <label for="business">Select you business type:</label>
+    <select formControlName="business" class="form-control">
+        <option value="">Choose a Business</option>
+        <option *ngFor="let businessType of businessTypes">{{ businessType.descript }}</option>
+    </select>
+    <div *ngIf="f.business.touched && f.business.invalid" class="alert alert-danger">
+      <div *ngIf="f.business.errors.required">Business is required.</div>
+    </div>
+
+    
+
+  </div>
+ 
+  <button class="btn btn-primary" type="submit" [disabled]="!form.valid">Submit</button>
+</form>

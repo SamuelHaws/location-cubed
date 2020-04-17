@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { HTTPService } from 'src/app/services/http.service';
 import { BusinessType } from 'src/app/models/BusinessType';
+import { FormGroup, FormControl, Validators} from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,12 +13,26 @@ import { BusinessType } from 'src/app/models/BusinessType';
 export class DashboardComponent implements OnInit {
   businessTypes: BusinessType[];
 
-  constructor(private httpService: HTTPService) {}
+  constructor(private httpService: HTTPService, private router: Router) {}
 
   ngOnInit() {
     this.httpService.getUniqueBusinessTypes().subscribe(businessTypes => {
       this.businessTypes = businessTypes;
       console.log(businessTypes);
     });
+  }
+
+  form = new FormGroup({
+    business: new FormControl('', Validators.required)
+  });
+  
+  get f(){
+    return this.form.controls;
+  }
+  
+  submit(){
+    console.log(this.form.value);
+    console.log("suck my actual cock and balls");
+    this.router.navigate(['/results']);
   }
 }
