@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { BusinessType } from '../models/BusinessType';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ export class HTTPService {
 
   constructor(private http: HttpClient) {}
 
-  getUniqueBusinessTypes() {
-    return this.http.get(this.apiUrl + '/unique');
+  getUniqueBusinessTypes(): Observable<BusinessType[]> {
+    return this.http.get(this.apiUrl + '/unique') as Observable<BusinessType[]>;
   }
 }
