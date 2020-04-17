@@ -2,8 +2,10 @@ from flask import Flask
 from sodapy import Socrata
 import config
 import json
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 client = Socrata("data.buffalony.gov", config.APP_TOKEN)
 
