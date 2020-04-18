@@ -32,7 +32,7 @@ def generatescorefromaddress(hono, street, businessType):
         
         else:
             return 0
-    else:
+    else: # If this is not a valid address
         return -1
 
 def calculateNeighbooringBusinesses(no, street, spread, businessType):
