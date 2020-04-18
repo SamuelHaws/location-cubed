@@ -12,7 +12,9 @@ export class HTTPService {
   constructor(private http: HttpClient) {}
 
   getUniqueBusinessTypes(): Observable<BusinessType[]> {
-    return this.http.get(this.apiUrl + '/unique') as Observable<BusinessType[]>;
+    return this.http.get(this.apiUrl + '/businesstypes') as Observable<
+      BusinessType[]
+    >;
   }
 
   getPlaces(businessType: string, lat: string, long: string): Observable<any> {
