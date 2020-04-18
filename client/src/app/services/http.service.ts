@@ -18,9 +18,11 @@ export class HTTPService {
   getPlaces(businessType: string, lat: string, long: string): Observable<any> {
     let params = new HttpParams();
 
-    params.set('businessType', businessType);
-    params.set('lat', lat);
-    params.set('long', long);
+    params = params.set('businessType', businessType);
+    params = params.set('lat', lat);
+    params = params.set('long', long);
+
+    console.log(params);
 
     return this.http.get(this.apiUrl + '/places', { params: params });
   }
