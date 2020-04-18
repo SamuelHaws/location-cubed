@@ -4,6 +4,7 @@ import { BusinessType } from 'src/app/models/BusinessType';
 import { FormGroup, FormControl, Validators} from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
+import { AgmCoreModule } from '@agm/core';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,6 +13,7 @@ import { Router } from '@angular/router';
 })
 export class DashboardComponent implements OnInit {
   businessTypes: BusinessType[];
+ 
 
   constructor(private httpService: HTTPService, private router: Router) {}
 
@@ -22,8 +24,11 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+
+
   form = new FormGroup({
-    business: new FormControl('', Validators.required)
+    business: new FormControl('', Validators.required),
+    address: new FormControl('', Validators.required)
   });
   
   get f(){
@@ -32,7 +37,8 @@ export class DashboardComponent implements OnInit {
   
   submit(){
     console.log(this.form.value);
-    console.log("suck my actual cock and balls");
     this.router.navigate(['/results']);
   }
+
+ 
 }
