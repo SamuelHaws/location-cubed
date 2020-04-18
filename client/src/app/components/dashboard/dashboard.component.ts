@@ -32,5 +32,6 @@ export class DashboardComponent implements OnInit {
 
   onSubmit() {
     console.log(this.businessTypeStr + ' ' + this.lat + ' ' + this.long);
+    this.httpService.getPlaces(this.businessTypeStr, this.lat, this.long);
   }
 }
