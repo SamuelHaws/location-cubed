@@ -9,11 +9,7 @@ CORS(app)
 
 client = Socrata("data.buffalony.gov", config.APP_TOKEN)
 
-@app.route('/')
-def index():
-  return "Hello, World!"
-
-@app.route('/test')
+@app.route('/crimedata')
 def test():
   return json.dumps(client.get("d6g9-xbgu", limit=200, content_type="json"))
 
