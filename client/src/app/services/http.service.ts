@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BusinessType } from '../models/BusinessType';
 
 @Injectable({
@@ -13,5 +13,17 @@ export class HTTPService {
 
   getUniqueBusinessTypes(): Observable<BusinessType[]> {
     return this.http.get(this.apiUrl + '/unique') as Observable<BusinessType[]>;
+  }
+
+  getPlaces(businessType: string, lat: string, long: string): Observable<any> {
+    let params = new HttpParams();
+
+    params = params.set('businessType', businessType);
+    params = params.set('lat', lat);
+    params = params.set('long', long);
+
+    console.log(params);
+
+    return this.http.get(this.apiUrl + '/places', { params: params });
   }
 }
