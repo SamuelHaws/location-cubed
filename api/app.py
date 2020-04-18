@@ -19,6 +19,13 @@ def test():
 def unique():
   return json.dumps(client.get("qcyy-feh8", limit=200, content_type="json", select="distinct(descript)"))
 
+@app.route('/getscorebyaddress')
+def getscorebyaddress():
+  housenumber = request.args.get('houseno', type = int)
+  street = request.args.get('street', type = str)
+  business = request.args.get('businessType', type = str)
+  return str(engine.generatescorefromaddress(housenumber, street, business))
+
 # Get a list of places within a radius based on coords via Google Places API
 @app.route('/places')
 def places():
@@ -26,6 +33,7 @@ def places():
   coordlong = request.args.get('long')
   url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=" + config.GOOGLE_API_KEY + "&location=" + coordlat + "," + coordlong + "&radius=100"
   return requests.get(url).json()
+
 
 if __name__ == '__main__':
   app.run(debug=True)
