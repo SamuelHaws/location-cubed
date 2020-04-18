@@ -14,15 +14,23 @@
             </select>
           </div>
           <div class="form-group">
+
+            <button class="btn btn-dark" (click)="loadMap()">Choose Starting Location</button>
+          </div>
+          <div class="form-group">
             <label for="lat">Latitude:</label>
             <input type="text" class="form-control" placeholder="Latitude" name="lat" [(ngModel)]="lat">
           </div>
           <div class="form-group">
-            <label for="long">Longitude:</label>
-            <input type="text" class="form-control" placeholder="Longitude" name="long" [(ngModel)]="long">
+            <label for="lng">Lngitude:</label>
+            <input type="text" class="form-control" placeholder="Longitude" name="lng" [(ngModel)]="lng">
+          </div>
+          <div class="form-group">
+            <label for="radius">Radius:</label>
+            <input type="number" class="form-control" placeholder="Radius" name="radius" [(ngModel)]="radius">
           </div>
           <button class="btn btn-primary" type="submit"
-            [disabled]="!businessTypeStr || lat == '' || long == ''">Submit</button>
+            [disabled]="!businessTypeStr || lat == '' || lng == ''">Submit</button>
         </form>
       </div>
     </div>

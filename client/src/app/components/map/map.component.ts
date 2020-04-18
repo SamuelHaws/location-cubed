@@ -1,10 +1,7 @@
-import {
-  Component,
-  OnInit,
-  AfterViewInit,
-  ViewChild,
-  ElementRef
-} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Marker } from 'src/app/models/Marker';
+import { MapService } from 'src/app/services/map.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-map',
@@ -12,30 +9,32 @@ import {
   styleUrls: ['./map.component.css']
 })
 export class MapComponent implements OnInit {
-  @ViewChild('mapContainer', { static: false }) gmap: ElementRef;
-  map: google.maps.Map;
-  lat = 40.73061;
-  lng = -73.935242;
-  coordinates = new google.maps.LatLng(this.lat, this.lng);
-  mapOptions: google.maps.MapOptions = {
-    center: this.coordinates,
-    zoom: 8
-  };
-  marker = new google.maps.Marker({
-    position: this.coordinates,
-    map: this.map
-  });
+  latitude = 42.890981;
+  longitude = -78.872579;
+  mapType = 'roadmap';
+  zoom = 12;
+  marker: Marker;
 
-  constructor() {}
+  constructor(private mapService: MapService, private router: Router) {}
 
   ngOnInit() {}
 
-  ngAfterViewInit() {
-    this.mapInitializer();
+  addMarker(lat: number, lng: number) {
+    this.marker = {
+      lat,
+      lng
+    };
+    // Center map on marker
+    this.latitude = lat;
+    this.longitude = lng;
+    // Expand confirmation modal
+    $('#confirmationModal').modal('toggle');
+
+    // this.mapService.marker = this.marker;
   }
 
-  mapInitializer() {
-    this.map = new google.maps.Map(this.gmap.nativeElement, this.mapOptions);
-    this.marker.setMap(this.map);
+  setMarker() {
+    this.mapService.marker = this.marker;
+    this.router.navigate(['/']);
   }
 }

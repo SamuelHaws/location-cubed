@@ -30,9 +30,9 @@ def getscorebyaddress():
 # Get a list of places within a radius based on coords via Google Places API
 @app.route('/places')
 def places():
-  coordlat = request.args.get('lat')
-  coordlong = request.args.get('long')
-  url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=" + config.GOOGLE_API_KEY + "&location=" + coordlat + "," + coordlong + "&radius=100"
+  lat = request.args.get('lat')
+  lng = request.args.get('lng')
+  url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=" + config.GOOGLE_API_KEY + "&location=" + lat + "," + lng + "&radius=100"
   return requests.get(url).json()
 
 
