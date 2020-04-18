@@ -25,7 +25,7 @@ def getscorebyaddress():
   housenumber = request.args.get('houseno', type = int)
   street = request.args.get('street', type = str)
   business = request.args.get('businessType', type = str)
-  return str(engine.generatescorefromaddress(housenumber, street, business))
+  return json.dumps(engine.generatescorefromaddress(housenumber, street, business))
 
 # Get a list of places within a radius based on coords via Google Places API
 @app.route('/places')

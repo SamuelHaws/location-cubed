@@ -18,22 +18,27 @@ def checkifzonedforcommercial(codetocheck):
         return False
 
 def generatescorefromaddress(hono, street, businessType):
+    returnable = []
     addressInfo = opendatabuffalo.get(
         "4eg6-xiba",
         content_type="json",
         hsenofr = hono,
-        street = street
+        where = "starts_with(street, upper('"+street+"'))"
     )
-    if(len(addressInfo) == 1):
-        zoneCode = addressInfo[0]['plctypfut3']
+    for location in addressInfo:
+        zoneCode = location['plctypfut3']
         if checkifzonedforcommercial(zoneCode):
+            housenumber = int(location['hsenofr'])
+            street = location['street']
+            score = calculateNeighbooringBusinesses(housenumber, street, 5, businessType)
 
-            return calculateNeighbooringBusinesses(hono, street, 5, businessType)
+            returnable.append({"address": str(housenumber) + " " + street, "score": score})
         
         else:
-            return 0
-    else: # If this is not a valid address
-        return -1
+            returnable.append({"address": location['hsenofr']+" "+location['street'], "score": 0})
+
+    return returnable
+    
 
 def calculateNeighbooringBusinesses(no, street, spread, businessType):
     similarBusinesses = 0

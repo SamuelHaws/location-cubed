@@ -35,7 +35,19 @@ export class DashboardComponent implements OnInit {
     this.httpService
       .getPlaces(this.businessTypeStr, this.lat, this.long)
       .subscribe(res => {
-        console.log(res);
+        this.sendAddressestoAPI(res.results);
       });
   }
+
+  /**
+   * Parses the places surrounding a point for the addresses and sends them to the API
+   * @param mapResponse The response from the submit that does the needful.
+   */
+  sendAddressestoAPI(mapResponse) {
+    mapResponse.forEach(location => {
+      console.log(location.vicinity);
+    });
+  }
+
+
 }
