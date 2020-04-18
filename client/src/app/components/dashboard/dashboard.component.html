@@ -1,20 +1,30 @@
-<form [formGroup]="form" (ngSubmit)="submit()">
-           
-  <div class="form-group">
-    <label for="business">Select you business type:</label>
-    <select formControlName="business" class="form-control">
-        <option value="">Choose a Business</option>
-        <option *ngFor="let businessType of businessTypes">{{ businessType.descript }}</option>
-    </select>
-    <div *ngIf="f.business.touched && f.business.invalid" class="alert alert-danger">
-      <div *ngIf="f.business.errors.required">Business is required.</div>
+<div class="row">
+  <div class="col-md-6 mx-auto">
+    <div class="card mt-5 bg-light">
+      <div class="card-body">
+        <h1 class="text-center pb-4 pt-3">
+          <span class="text-primary">Welcome to Location<sup>3</sup>!</span>
+        </h1>
+        <form (submit)="onSubmit()">
+          <div class="form-group">
+            <label for="business">Select your business type:</label>
+            <select class="form-control" name="businessType" [(ngModel)]="businessTypeStr">
+              <option value="">Choose a Business</option>
+              <option *ngFor="let businessType of businessTypes">{{ businessType.descript }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="lat">Latitude:</label>
+            <input type="text" class="form-control" placeholder="Latitude" name="lat" [(ngModel)]="lat">
+          </div>
+          <div class="form-group">
+            <label for="long">Longitude:</label>
+            <input type="text" class="form-control" placeholder="Longitude" name="long" [(ngModel)]="long">
+          </div>
+          <button class="btn btn-primary" type="submit"
+            [disabled]="!businessTypeStr || lat == '' || long == ''">Submit</button>
+        </form>
+      </div>
     </div>
-
-    <input type = "text" 
-      formControlName="address" class="form-control"
-        placeholder = "Address">
-
   </div>
- 
-  <button class="btn btn-primary" type="submit" [disabled]="!form.valid">Submit</button>
-</form>
+</div>

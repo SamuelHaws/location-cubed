@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { HTTPService } from 'src/app/services/http.service';
 import { BusinessType } from 'src/app/models/BusinessType';
-import { FormGroup, FormControl, Validators} from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
 import { AgmCoreModule } from '@agm/core';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,32 +14,28 @@ import { AgmCoreModule } from '@agm/core';
 })
 export class DashboardComponent implements OnInit {
   businessTypes: BusinessType[];
- 
+  businessTypeStr: string;
+  lat: string = '';
+  long: string = '';
 
   constructor(private httpService: HTTPService, private router: Router) {}
 
   ngOnInit() {
-    this.httpService.getUniqueBusinessTypes().subscribe(businessTypes => {
-      this.businessTypes = businessTypes;
-      console.log(businessTypes);
-    });
+    this.httpService
+      .getUniqueBusinessTypes()
+      .pipe(take(1))
+      .subscribe(businessTypes => {
+        this.businessTypes = businessTypes;
+        console.log(businessTypes);
+      });
   }
 
-
-
-  form = new FormGroup({
-    business: new FormControl('', Validators.required),
-    address: new FormControl('', Validators.required)
-  });
-  
-  get f(){
-    return this.form.controls;
+  onSubmit() {
+    console.log(this.businessTypeStr + ' ' + this.lat + ' ' + this.long);
+    this.httpService
+      .getPlaces(this.businessTypeStr, this.lat, this.long)
+      .subscribe(res => {
+        console.log(res);
+      });
   }
-  
-  submit(){
-    console.log(this.form.value);
-    this.router.navigate(['/results']);
-  }
-
- 
 }
