@@ -17,7 +17,8 @@ def checkifzonedforcommercial(codetocheck):
     else:
         return False
 
-def generatescoresfromaddresses(addresses, businessType):
+# Main engine function. Takes a list of addresses, a business type, and a radius for the the region to be searched, and sends back the list of addresses and their scores.
+def generatescoresfromaddresses(addresses, businessType, radius):
     returnable = []
 
     for address in addresses:
@@ -30,37 +31,47 @@ def generatescoresfromaddresses(addresses, businessType):
             hsenofr = hono,
             where = "starts_with(street, upper('"+street+"'))"
         )
-        for location in addressInfo:
+        if len(addressInfo) > 0: # TODO: Find better way. Currently, this takes the first address that comes back from the search and checks its zone. This is bad because the first address may not necessarily be the address that the coordinates are for. Should add logic to check if the coordinates are in the geo fence for this address.
+            location = addressInfo[0]
             zoneCode = location['plctypfut3']
+
+            # The actual algorithm part.
+            # Only goes through the algorithm if the address is zoned for commercial.
             if checkifzonedforcommercial(zoneCode):
                 housenumber = int(location['hsenofr'])
                 street = location['street']
                 singlelineAddress = str(housenumber) + " " + street
+                lat = address['lat']
+                lng = address['long']
                 
-                surroundingBusinesses = calculateNeighbooringBusinesses(housenumber, street, 5, businessType)
+                # Grab data set stuff
+                surroundingBusinesses = calculateNeighbooringBusinesses(lat, lng, radius, businessType)
                 crimeReports = len(opendatabuffalo.get(
                     "d6g9-xbgu",
-                    where = "address_1 like '" + singlelineAddress + "'"
+                    where = "latitude between '"+ str(lat - radius) + "' and '" + str(lat + radius) + "' AND longitude between '" + str(lng - radius) + "' and '"+ str(lng + radius) + "'"
                 ))
 
+                # Score generation algorithm
                 score = ((.5 * surroundingBusinesses)+(.5* crimeReports))/100
 
                 returnable.append({"address": singlelineAddress, "score": score})
             
+            # If the address is not zoned for commercial.
             else:
                 returnable.append({"address": location['hsenofr']+" "+location['street'], "score": 0})
 
     return returnable
     
 
-def calculateNeighbooringBusinesses(no, street, spread, businessType):
+def calculateNeighbooringBusinesses(lat, lng, spread, businessType):
+    
     similarBusinesses = 0
-    for hono in range((no-spread), (no+spread+1)):
-        existingBusiness = opendatabuffalo.get(
-            "qcyy-feh8",
-            address = str(hono) + " " + street,
-            descript = businessType
-        )
-        similarBusinesses += len(existingBusiness)
+
+    existingBusiness = opendatabuffalo.get(
+        "qcyy-feh8",
+        descript = businessType,
+        where = "latitude between '"+ str(lat - spread) + "' and '" + str(lat + spread) + "' AND longitude between '" + str(lng - spread) + "' and '"+ str(lng + spread) + "'"
+    )
+    similarBusinesses += len(existingBusiness)
     
     return similarBusinesses

@@ -36,14 +36,17 @@ def internalPlacesCall(coordlat, coordlong):
   url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=" + config.GOOGLE_API_KEY + "&location=" + coordlat + "," + coordlong + "&radius=100"
   return requests.get(url).json()
 
+# Takes a latitude, longitude, radius, and business type and gives a list of addresses and there scores.
 @app.route('/getscoresbycoordinate')
 def getscoresbycoordinate():
   coordlat = request.args.get('lat')
   coordlong = request.args.get('long')
   businessType = request.args.get('businessType', type = str)
+  radius = request.args.get('radius')
   mapInfo = internalPlacesCall(coordlat, coordlong)['results']
   sendable = []
 
+  # builds the addresses to send to the engine.
   for location in mapInfo:
     addressParts = location['vicinity'].split(" ")
     i = 0
@@ -51,14 +54,16 @@ def getscoresbycoordinate():
       try: 
         currentAddress = {
           "housenumber": int(addressParts[i]),
-          "street": addressParts[i+1]
+          "street": addressParts[i+1],
+          "lat": location['geometry']['location']['lat'],
+          "long": location['geometry']['location']['lng']
         }
         sendable.append(currentAddress)
         i+=1000
       except ValueError:
         i+=1
   
-  return json.dumps(engine.generatescoresfromaddresses(sendable, businessType))
+  return json.dumps(engine.generatescoresfromaddresses(sendable, businessType, (float(radius) / 111090.58224106459)))
 
 
 if __name__ == '__main__':
