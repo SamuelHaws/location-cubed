@@ -26,12 +26,10 @@ export class DashboardComponent implements OnInit {
       .pipe(take(1))
       .subscribe(businessTypes => {
         this.businessTypes = businessTypes;
-        console.log(businessTypes);
       });
   }
 
   onSubmit() {
-    console.log(this.businessTypeStr + ' ' + this.lat + ' ' + this.long);
     this.httpService
       .getPlaces(this.businessTypeStr, this.lat, this.long)
       .subscribe(res => {
@@ -44,8 +42,22 @@ export class DashboardComponent implements OnInit {
    * @param mapResponse The response from the submit that does the needful.
    */
   sendAddressestoAPI(mapResponse) {
+    var sendable = [];
     mapResponse.forEach(location => {
-      console.log(location.vicinity);
+      var addressParts = location.vicinity.split(" ");
+      for(var i = 0; i < addressParts.length; i++) {
+        // console.log(addressParts[i]);
+        if(!isNaN(addressParts[i])) {
+          var currentAddress = {
+            "housenumber": addressParts[i],
+            "street": addressParts[i+1]
+          };
+          sendable.push(currentAddress);
+        }
+      }
+    });
+    this.httpService.getScoreByAddress(JSON.stringify(sendable), this.businessTypeStr).subscribe(res => {
+      console.log(res);
     });
   }
 

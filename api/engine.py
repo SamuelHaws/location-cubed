@@ -17,25 +17,38 @@ def checkifzonedforcommercial(codetocheck):
     else:
         return False
 
-def generatescorefromaddress(hono, street, businessType):
+def generatescorefromaddress(addresses, businessType):
     returnable = []
-    addressInfo = opendatabuffalo.get(
-        "4eg6-xiba",
-        content_type="json",
-        hsenofr = hono,
-        where = "starts_with(street, upper('"+street+"'))"
-    )
-    for location in addressInfo:
-        zoneCode = location['plctypfut3']
-        if checkifzonedforcommercial(zoneCode):
-            housenumber = int(location['hsenofr'])
-            street = location['street']
-            score = calculateNeighbooringBusinesses(housenumber, street, 5, businessType)
 
-            returnable.append({"address": str(housenumber) + " " + street, "score": score})
-        
-        else:
-            returnable.append({"address": location['hsenofr']+" "+location['street'], "score": 0})
+    for address in addresses:
+        hono = address['housenumber']
+        street = address['street']
+
+        addressInfo = opendatabuffalo.get(
+            "4eg6-xiba",
+            content_type="json",
+            hsenofr = hono,
+            where = "starts_with(street, upper('"+street+"'))"
+        )
+        for location in addressInfo:
+            zoneCode = location['plctypfut3']
+            if checkifzonedforcommercial(zoneCode):
+                housenumber = int(location['hsenofr'])
+                street = location['street']
+                singlelineAddress = str(housenumber) + " " + street
+                
+                surroundingBusinesses = calculateNeighbooringBusinesses(housenumber, street, 5, businessType)
+                crimeReports = len(opendatabuffalo.get(
+                    "d6g9-xbgu",
+                    where = "address_1 like '" + singlelineAddress + "'"
+                ))
+
+                score = ((.5 * surroundingBusinesses)+(.5* crimeReports))/100
+
+                returnable.append({"address": singlelineAddress, "score": score})
+            
+            else:
+                returnable.append({"address": location['hsenofr']+" "+location['street'], "score": 0})
 
     return returnable
     

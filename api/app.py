@@ -22,10 +22,9 @@ def unique():
 
 @app.route('/getscorebyaddress')
 def getscorebyaddress():
-  housenumber = request.args.get('houseno', type = int)
-  street = request.args.get('street', type = str)
-  business = request.args.get('businessType', type = str)
-  return json.dumps(engine.generatescorefromaddress(housenumber, street, business))
+  addresses = json.loads(request.args.get('addresses', type = str))
+  businessType = request.args.get('businessType', type = str)
+  return json.dumps(engine.generatescorefromaddress(addresses, businessType))
 
 # Get a list of places within a radius based on coords via Google Places API
 @app.route('/places')

@@ -24,8 +24,15 @@ export class HTTPService {
     params = params.set('lat', lat);
     params = params.set('long', long);
 
-    console.log(params);
-
     return this.http.get(this.apiUrl + '/places', { params: params });
+  }
+
+  getScoreByAddress(addresses: string, businessType: string): Observable<any> {
+    let params = new HttpParams();
+
+    params = params.set('addresses', addresses);
+    params = params.set('businessType', businessType);
+
+    return this.http.get(this.apiUrl + '/getscorebyaddress', { params: params });
   }
 }
