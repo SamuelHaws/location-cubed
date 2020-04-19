@@ -1,1 +1,23 @@
-<div #mapContainer id="map"></div>
+<agm-map [latitude]="latitude" [longitude]="longitude" [mapTypeId]="mapType" [zoom]="zoom"
+  (mapClick)="addMarker($event.coords.lat, $event.coords.lng)">
+  <agm-marker *ngIf="marker" ngDefaultControl [(ngModel)]="marker" [latitude]="marker.lat" [longitude]="marker.lng">
+  </agm-marker>
+</agm-map>
+
+<!-- Comfirmation Modal -->
+<div id="confirmationModal" class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Are you sure you want to set this marker as your starting location?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer d-flex justify-content-around">
+        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="setMarker()">Yes</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+      </div>
+    </div>
+  </div>
+</div>
