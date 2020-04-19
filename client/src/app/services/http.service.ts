@@ -35,4 +35,15 @@ export class HTTPService {
 
     return this.http.get(this.apiUrl + '/getscorebyaddress', { params: params });
   }
+
+  getScoresByCoordinate(businessType: string, lat: string, long: string): Observable<any> {
+    let params = new HttpParams();
+
+    params = params.set('businessType', businessType);
+    params = params.set('lat', lat);
+    params = params.set('long', long);
+
+    return this.http.get(this.apiUrl + '/getscoresbycoordinate', { params: params });
+  }
+
 }

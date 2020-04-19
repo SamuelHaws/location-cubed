@@ -17,7 +17,7 @@ def checkifzonedforcommercial(codetocheck):
     else:
         return False
 
-def generatescorefromaddress(addresses, businessType):
+def generatescoresfromaddresses(addresses, businessType):
     returnable = []
 
     for address in addresses:

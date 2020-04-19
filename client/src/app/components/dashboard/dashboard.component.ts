@@ -31,34 +31,10 @@ export class DashboardComponent implements OnInit {
 
   onSubmit() {
     this.httpService
-      .getPlaces(this.businessTypeStr, this.lat, this.long)
+      .getScoresByCoordinate(this.businessTypeStr, this.lat, this.long)
       .subscribe(res => {
-        this.sendAddressestoAPI(res.results);
+        console.log(res);
       });
-  }
-
-  /**
-   * Parses the places surrounding a point for the addresses and sends them to the API
-   * @param mapResponse The response from the submit that does the needful.
-   */
-  sendAddressestoAPI(mapResponse) {
-    var sendable = [];
-    mapResponse.forEach(location => {
-      var addressParts = location.vicinity.split(" ");
-      for(var i = 0; i < addressParts.length; i++) {
-        // console.log(addressParts[i]);
-        if(!isNaN(addressParts[i])) {
-          var currentAddress = {
-            "housenumber": addressParts[i],
-            "street": addressParts[i+1]
-          };
-          sendable.push(currentAddress);
-        }
-      }
-    });
-    this.httpService.getScoreByAddress(JSON.stringify(sendable), this.businessTypeStr).subscribe(res => {
-      console.log(res);
-    });
   }
 
 
