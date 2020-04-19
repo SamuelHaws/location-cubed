@@ -8,29 +8,28 @@
         <form (submit)="onSubmit()">
           <div class="form-group">
             <label for="business">Select your business type:</label>
-            <select class="form-control" name="businessType" [(ngModel)]="businessTypeStr">
+            <select class="form-control" name="businessType" [(ngModel)]="businessType">
               <option value="">Choose a Business</option>
-              <option *ngFor="let businessType of businessTypes">{{ businessType.descript }}</option>
+              <option *ngFor="let businessType of businessTypes" [value]="businessType">{{ businessType }}</option>
             </select>
           </div>
           <div class="form-group">
-
             <button class="btn btn-dark" (click)="loadMap()">Choose Starting Location</button>
           </div>
           <div class="form-group">
             <label for="lat">Latitude:</label>
-            <input type="text" class="form-control" placeholder="Latitude" name="lat" [(ngModel)]="lat">
+            <input type="number" class="form-control" placeholder="Latitude" name="lat" [(ngModel)]="lat">
           </div>
           <div class="form-group">
-            <label for="lng">Lngitude:</label>
-            <input type="text" class="form-control" placeholder="Longitude" name="lng" [(ngModel)]="lng">
+            <label for="lng">Longitude:</label>
+            <input type="number" class="form-control" placeholder="Longitude" name="lng" [(ngModel)]="lng">
           </div>
           <div class="form-group">
             <label for="radius">Radius:</label>
             <input type="number" class="form-control" placeholder="Radius" name="radius" [(ngModel)]="radius">
           </div>
           <button class="btn btn-primary" type="submit"
-            [disabled]="!businessTypeStr || lat == '' || lng == ''">Submit</button>
+            [disabled]="!businessType || lat == '' || lng == '' || !radius">Submit</button>
         </form>
       </div>
     </div>

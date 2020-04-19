@@ -6,6 +6,8 @@ import { Marker } from '../models/Marker';
 })
 export class MapService {
   marker: Marker;
+  radius: number;
+  businessType: string;
 
   constructor() {}
 }

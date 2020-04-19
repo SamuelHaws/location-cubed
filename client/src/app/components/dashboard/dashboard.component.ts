@@ -14,10 +14,14 @@ import { MapService } from 'src/app/services/map.service';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  businessTypes: BusinessType[];
-  businessTypeStr: string;
+  // All business Types that exist in the OpenData Business License dataset
+  businessTypes: string[] = [];
+  businessTypeFormGroup: FormGroup;
+  // User's chosen business type, as a string (to be used as HTTP param)
+  businessType: string;
   lat: string = '';
   lng: string = '';
+  // radius to look for places from (lat,lng) in meters
   radius: number;
 
   constructor(
@@ -31,9 +35,13 @@ export class DashboardComponent implements OnInit {
       .getUniqueBusinessTypes()
       .pipe(take(1))
       .subscribe(businessTypes => {
-        this.businessTypes = businessTypes;
-        console.log(businessTypes);
+        businessTypes.forEach(businessType => {
+          this.businessTypes.push(businessType.descript);
+        });
       });
+
+    this.businessType = this.mapService.businessType;
+    this.radius = this.mapService.radius;
 
     if (this.mapService.marker) {
       this.lat = this.mapService.marker.lat.toString();
@@ -42,15 +50,17 @@ export class DashboardComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log(this.businessTypeStr + ' ' + this.lat + ' ' + this.lng);
+    console.log(this.businessType + ' ' + this.lat + ' ' + this.lng);
     this.httpService
-      .getPlaces(this.businessTypeStr, this.lat, this.lng)
+      .getPlaces(this.businessType, this.lat, this.lng)
       .subscribe(res => {
         console.log(res);
       });
   }
 
   loadMap() {
+    this.mapService.businessType = this.businessType;
+    this.mapService.radius = this.radius;
     this.router.navigate(['/map']);
   }
 }
