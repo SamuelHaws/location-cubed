@@ -17,12 +17,18 @@ export class HTTPService {
     >;
   }
 
-  getPlaces(businessType: string, lat: string, lng: string): Observable<any> {
+  getPlaces(
+    businessType: string,
+    lat: string,
+    lng: string,
+    radius: number
+  ): Observable<any> {
     let params = new HttpParams();
 
     params = params.set('businessType', businessType);
     params = params.set('lat', lat);
     params = params.set('lng', lng);
+    params = params.set('rad', radius.toString());
 
     return this.http.get(this.apiUrl + '/places', { params: params });
   }

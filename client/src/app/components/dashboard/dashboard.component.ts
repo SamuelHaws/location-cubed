@@ -52,7 +52,7 @@ export class DashboardComponent implements OnInit {
   onSubmit() {
     console.log(this.businessType + ' ' + this.lat + ' ' + this.lng);
     this.httpService
-      .getPlaces(this.businessType, this.lat, this.lng)
+      .getPlaces(this.businessType, this.lat, this.lng, this.radius)
       .subscribe(res => {
         console.log(res);
       });

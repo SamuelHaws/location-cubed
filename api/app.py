@@ -32,7 +32,8 @@ def getscorebyaddress():
 def places():
   lat = request.args.get('lat')
   lng = request.args.get('lng')
-  url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=" + config.GOOGLE_API_KEY + "&location=" + lat + "," + lng + "&radius=100"
+  rad = request.args.get('rad')
+  url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=" + config.GOOGLE_API_KEY + "&location=" + lat + "," + lng + "&radius=" + rad
   return requests.get(url).json()
 
 
