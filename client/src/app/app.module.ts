@@ -9,10 +9,17 @@ import { ResultscreenComponent } from './components/resultscreen/resultscreen.co
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AgmCoreModule } from '@agm/core';
-import { MapComponent } from './components/map/map.component';
+import { MarkerMapComponent } from './components/markermap/markermap.component';
+import { HeatMapComponent } from './components/heatmap/heatmap.component';
 
 @NgModule({
-  declarations: [AppComponent, DashboardComponent, ResultscreenComponent, MapComponent],
+  declarations: [
+    AppComponent,
+    DashboardComponent,
+    ResultscreenComponent,
+    MarkerMapComponent,
+    HeatMapComponent
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -20,7 +27,8 @@ import { MapComponent } from './components/map/map.component';
     FormsModule,
     ReactiveFormsModule,
     AgmCoreModule.forRoot({
-      apiKey: 'AIzaSyBLT-P4ecWpHBsk1OMVPgJftjqf5G6klSQ'
+      apiKey: 'AIzaSyBLT-P4ecWpHBsk1OMVPgJftjqf5G6klSQ&libaries',
+      libraries: ['visualization']
     })
   ],
   providers: [],

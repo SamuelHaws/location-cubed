@@ -5,10 +5,10 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-map',
-  templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css']
+  templateUrl: './markermap.component.html',
+  styleUrls: ['./markermap.component.css']
 })
-export class MapComponent implements OnInit {
+export class MarkerMapComponent implements OnInit {
   latitude = 42.890981;
   longitude = -78.872579;
   mapType = 'roadmap';
