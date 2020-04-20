@@ -5,6 +5,7 @@ opendatabuffalo = Socrata("data.buffalony.gov", config.APP_TOKEN)
 def checkifzonedforcommercial(codetocheck):
     commercialzonecodes = [
         "N-1C",
+        "N-1D",
         "N-2C",
         "N-2E",
         "N-3C",
@@ -34,6 +35,8 @@ def generatescoresfromaddresses(addresses, businessType, radius):
         if len(addressInfo) > 0: # TODO: Find better way. Currently, this takes the first address that comes back from the search and checks its zone. This is bad because the first address may not necessarily be the address that the coordinates are for. Should add logic to check if the coordinates are in the geo fence for this address.
             location = addressInfo[0]
             zoneCode = location['plctypfut3']
+            lat = address['lat']
+            lng = address['lng']
 
             # The actual algorithm part.
             # Only goes through the algorithm if the address is zoned for commercial.
@@ -41,8 +44,6 @@ def generatescoresfromaddresses(addresses, businessType, radius):
                 housenumber = int(location['hsenofr'])
                 street = location['street']
                 singlelineAddress = str(housenumber) + " " + street
-                lat = address['lat']
-                lng = address['long']
                 
                 # Grab data set stuff
                 surroundingBusinesses = calculateNeighbooringBusinesses(lat, lng, radius, businessType)
@@ -54,11 +55,11 @@ def generatescoresfromaddresses(addresses, businessType, radius):
                 # Score generation algorithm
                 score = ((.5 * surroundingBusinesses)+(.5* crimeReports))/100
 
-                returnable.append({"address": singlelineAddress, "score": score})
+                returnable.append({"lat": lat, "lng": lng, "address": singlelineAddress, "score": score})
             
             # If the address is not zoned for commercial.
             else:
-                returnable.append({"address": location['hsenofr']+" "+location['street'], "score": 0})
+                returnable.append({"lat": lat, "lng": lng, "address": location['hsenofr']+" "+location['street'], "score": 0})
 
     return returnable
     

@@ -33,23 +33,39 @@ export class HTTPService {
     return this.http.get(this.apiUrl + '/places', { params: params });
   }
 
-  getScoreByAddress(addresses: string, businessType: string): Observable<any> {
+  getScoreByAddress(
+    addresses: string,
+    businessType: string,
+    radius: string
+  ): Observable<any> {
     let params = new HttpParams();
 
     params = params.set('addresses', addresses);
     params = params.set('businessType', businessType);
+    params = params.set('rad', radius.toString());
 
-    return this.http.get(this.apiUrl + '/getscorebyaddress', { params: params });
+    return this.http.get(this.apiUrl + '/getscorebyaddress', {
+      params: params
+    });
   }
 
-  getScoresByCoordinate(businessType: string, lat: string, long: string): Observable<any> {
+  getScoresByCoordinate(
+    businessType: string,
+    lat: string,
+    lng: string,
+    radius: number
+  ): Observable<any> {
     let params = new HttpParams();
+
+    console.log(radius);
 
     params = params.set('businessType', businessType);
     params = params.set('lat', lat);
-    params = params.set('long', long);
+    params = params.set('lng', lng);
+    params = params.set('rad', radius.toString());
 
-    return this.http.get(this.apiUrl + '/getscoresbycoordinate', { params: params });
+    return this.http.get(this.apiUrl + '/getscoresbycoordinate', {
+      params: params
+    });
   }
-
 }

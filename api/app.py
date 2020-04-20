@@ -24,7 +24,8 @@ def unique():
 def getscoresbyaddresses():
   addresses = json.loads(request.args.get('addresses', type = str))
   businessType = request.args.get('businessType', type = str)
-  return json.dumps(engine.generatescoresfromaddresses(addresses, businessType))
+  radius = request.args.get('rad')
+  return json.dumps(engine.generatescoresfromaddresses(addresses, businessType, radius))
 
 # Get a list of places within a radius based on coords via Google Places API
 @app.route('/places')
@@ -34,18 +35,18 @@ def places():
   rad = request.args.get('rad')
   return internalPlacesCall(lat, lng, rad)
 
-def internalPlacesCall(lat, long, rad):
+def internalPlacesCall(lat, lng, rad):
   url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=" + config.GOOGLE_API_KEY + "&location=" + lat + "," + lng + "&radius=" + rad
   return requests.get(url).json()
 
 # Takes a latitude, longitude, radius, and business type and gives a list of addresses and there scores.
 @app.route('/getscoresbycoordinate')
 def getscoresbycoordinate():
-  coordlat = request.args.get('lat')
-  coordlong = request.args.get('long')
+  lat = request.args.get('lat')
+  lng = request.args.get('lng')
   businessType = request.args.get('businessType', type = str)
-  radius = request.args.get('radius')
-  mapInfo = internalPlacesCall(coordlat, coordlong)['results']
+  radius = request.args.get('rad')
+  mapInfo = internalPlacesCall(lat, lng, radius)['results']
   sendable = []
 
   # builds the addresses to send to the engine.
@@ -58,13 +59,14 @@ def getscoresbycoordinate():
           "housenumber": int(addressParts[i]),
           "street": addressParts[i+1],
           "lat": location['geometry']['location']['lat'],
-          "long": location['geometry']['location']['lng']
+          "lng": location['geometry']['location']['lng']
         }
         sendable.append(currentAddress)
         i+=1000
       except ValueError:
         i+=1
   
+  # Send address objects from Places API to engine
   return json.dumps(engine.generatescoresfromaddresses(sendable, businessType, (float(radius) / 111090.58224106459)))
 
 
