@@ -29,11 +29,13 @@ def getscoresbyaddresses():
 # Get a list of places within a radius based on coords via Google Places API
 @app.route('/places')
 def places():
-  coordlat = request.args.get('lat')
-  coordlong = request.args.get('long')
-  return internalPlacesCall(coordlat, coordlong)
-def internalPlacesCall(coordlat, coordlong):
-  url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=" + config.GOOGLE_API_KEY + "&location=" + coordlat + "," + coordlong + "&radius=100"
+  lat = request.args.get('lat')
+  lng = request.args.get('lng')
+  rad = request.args.get('rad')
+  return internalPlacesCall(lat, lng, rad)
+
+def internalPlacesCall(lat, long, rad):
+  url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=" + config.GOOGLE_API_KEY + "&location=" + lat + "," + lng + "&radius=" + rad
   return requests.get(url).json()
 
 # Takes a latitude, longitude, radius, and business type and gives a list of addresses and there scores.
