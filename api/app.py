@@ -5,7 +5,6 @@ import config
 import json
 import requests
 import engine
-import newengine
 
 app = Flask(__name__)
 CORS(app)
@@ -22,7 +21,7 @@ def scores():
   lng = request.args.get('lng')
   rad = request.args.get('rad')
   businessType = request.args.get('businessType')
-  return json.dumps(newengine.generateScoresFromCoords(lat, lng, rad, businessType))
+  return json.dumps(engine.generateScoresFromCoords(lat, lng, rad, businessType))
 
 if __name__ == '__main__':
   app.run(debug=True)

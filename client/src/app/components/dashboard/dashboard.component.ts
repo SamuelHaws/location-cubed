@@ -57,16 +57,8 @@ export class DashboardComponent implements OnInit {
         this.mapService.data = res;
         this.router.navigate(['/heatmap']);
       });
-
-    // this.httpService
-    //   .getScoresByCoordinate(this.businessType, this.lat, this.lng, this.radius)
-    //   .pipe(take(1))
-    //   .subscribe(scores => {
-    //     console.log(scores);
-    //     this.mapService.scores = scores;
-    //     this.router.navigate(['/heatmap']);
-    //   });
   }
+
   loadMap() {
     this.mapService.businessType = this.businessType;
     this.mapService.rad = this.rad;
