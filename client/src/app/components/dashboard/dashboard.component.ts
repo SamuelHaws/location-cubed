@@ -52,13 +52,16 @@ export class DashboardComponent implements OnInit {
   onSubmit() {
     this.httpService
       .getScoresByCoordinate(this.businessType, this.lat, this.lng, this.radius)
-      .subscribe(res => {
-        console.log(res);
+      .pipe(take(1))
+      .subscribe(scores => {
+        console.log(scores);
+        this.mapService.scores = scores;
+        this.router.navigate(['/heatmap']);
       });
   }
   loadMap() {
     this.mapService.businessType = this.businessType;
     this.mapService.radius = this.radius;
-    this.router.navigate(['/map']);
+    this.router.navigate(['/markermap']);
   }
 }
