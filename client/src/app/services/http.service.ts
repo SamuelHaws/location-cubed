@@ -33,6 +33,22 @@ export class HTTPService {
     return this.http.get(this.apiUrl + '/places', { params: params });
   }
 
+  getScores(
+    lat: string,
+    lng: string,
+    rad: number,
+    businessType: string
+  ): Observable<any> {
+    let params = new HttpParams();
+
+    params = params.set('businessType', businessType);
+    params = params.set('lat', lat);
+    params = params.set('lng', lng);
+    params = params.set('rad', rad.toString());
+
+    return this.http.get(this.apiUrl + '/scores', { params: params });
+  }
+
   getScoreByAddress(
     addresses: string,
     businessType: string,

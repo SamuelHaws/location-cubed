@@ -7,9 +7,10 @@ import { Score } from '../models/Score';
 })
 export class MapService {
   marker: Marker;
-  radius: number;
+  rad: number;
   businessType: string;
   scores: Score[] = [];
+  data: any[];
 
   constructor() {}
 }
