@@ -9,8 +9,6 @@ export class MapService {
   marker: Marker;
   rad: number;
   businessType: string;
-  scores: Score[] = [];
-  data: any[];
 
   constructor() {}
 }

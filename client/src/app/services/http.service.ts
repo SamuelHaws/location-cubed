@@ -9,6 +9,10 @@ import { BusinessType } from '../models/BusinessType';
 export class HTTPService {
   apiUrl = 'http://localhost:5000';
 
+  crimeData: Observable<any>;
+  businessData: Observable<any>;
+  zoneData: Observable<any>;
+
   constructor(private http: HttpClient) {}
 
   getUniqueBusinessTypes(): Observable<BusinessType[]> {
@@ -17,29 +21,21 @@ export class HTTPService {
     >;
   }
 
-  getCommercialZones(lat: string, lng: string, rad: number): Observable<any> {
+  getMapResultData(lat: string, lng: string, rad: number) {
     let params = new HttpParams();
 
     params = params.set('lat', lat);
     params = params.set('lng', lng);
     params = params.set('rad', rad.toString());
 
-    return this.http.get(this.apiUrl + '/zones', { params: params });
-  }
-
-  getScores(
-    lat: string,
-    lng: string,
-    rad: number,
-    businessType: string
-  ): Observable<any> {
-    let params = new HttpParams();
-
-    params = params.set('businessType', businessType);
-    params = params.set('lat', lat);
-    params = params.set('lng', lng);
-    params = params.set('rad', rad.toString());
-
-    return this.http.get(this.apiUrl + '/scores', { params: params });
+    this.crimeData = this.http.get(this.apiUrl + '/crimes', {
+      params: params
+    });
+    this.businessData = this.http.get(this.apiUrl + '/businesses', {
+      params: params
+    });
+    this.zoneData = this.http.get(this.apiUrl + '/zones', {
+      params: params
+    });
   }
 }

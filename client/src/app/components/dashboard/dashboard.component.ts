@@ -46,23 +46,11 @@ export class DashboardComponent implements OnInit {
       this.lat = this.mapService.marker.lat.toString();
       this.lng = this.mapService.marker.lng.toString();
     }
-
-    this.httpService
-      .getCommercialZones(this.lat, this.lng, this.rad)
-      .subscribe(zones => {
-        console.log(zones);
-      });
   }
 
   onSubmit() {
-    this.httpService
-      .getScores(this.lat, this.lng, this.rad, this.businessType)
-      .pipe(take(1))
-      .subscribe(res => {
-        console.log(res);
-        this.mapService.data = res;
-        this.router.navigate(['/heatmap']);
-      });
+    this.httpService.getMapResultData(this.lat, this.lng, this.rad);
+    this.router.navigate(['/heatmap']);
   }
 
   loadMap() {
