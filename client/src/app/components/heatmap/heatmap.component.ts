@@ -11,7 +11,7 @@ export class HeatMapComponent implements OnInit {
   longitude = -78.872579;
   mapType = 'roadmap';
   zoom = 12;
-  maxZoom = 17;
+  maxZoom = 16;
 
   private map: google.maps.Map = null;
   private crimeHeatMap: google.maps.visualization.HeatmapLayer = null;
@@ -24,20 +24,40 @@ export class HeatMapComponent implements OnInit {
   onMapLoad(mapInstance: google.maps.Map) {
     this.map = mapInstance;
 
-    // here our in other method after you get the coords; but make sure map is loaded
-    let heatmapdata = [];
+    let crimeHeatMapData = [];
+    let businessHeatMapData = [];
 
     this.mapService.data[0].forEach(incident => {
-      heatmapdata.push({
+      crimeHeatMapData.push({
         location: new google.maps.LatLng(incident.latitude, incident.longitude)
+      });
+    });
+
+    this.mapService.data[1].forEach(business => {
+      businessHeatMapData.push({
+        location: new google.maps.LatLng(business.latitude, business.longitude)
       });
     });
 
     this.crimeHeatMap = new google.maps.visualization.HeatmapLayer({
       map: this.map,
-      data: heatmapdata,
-      gradient: ['rgba(255, 151, 212, 111)', 'rgba(111, 131, 151, 241)'],
+      data: crimeHeatMapData,
+      // gradient: [
+      //   'rgba(0, 0, 0, 0)',
+      //   'rgba(0, 255, 0, 1)',
+      //   'rgba(0, 0, 255, 1)'
+      // ],
       radius: 50
+    });
+    this.businessHeatMap = new google.maps.visualization.HeatmapLayer({
+      map: this.map,
+      data: businessHeatMapData,
+      gradient: [
+        'rgba(0, 0, 0, 0)',
+        'rgba(137, 196, 244, 1)',
+        'rgba(77, 5, 232, 1)'
+      ],
+      radius: 150
     });
   }
 }

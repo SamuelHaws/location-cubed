@@ -17,6 +17,16 @@ export class HTTPService {
     >;
   }
 
+  getZoneData(lat: string, lng: string, rad: number): Observable<any> {
+    let params = new HttpParams();
+
+    params = params.set('lat', lat);
+    params = params.set('lng', lng);
+    params = params.set('rad', rad.toString());
+
+    return this.http.get(this.apiUrl + '/zones', { params: params });
+  }
+
   getScores(
     lat: string,
     lng: string,

@@ -46,6 +46,12 @@ export class DashboardComponent implements OnInit {
       this.lat = this.mapService.marker.lat.toString();
       this.lng = this.mapService.marker.lng.toString();
     }
+
+    this.httpService
+      .getZoneData('42.893545', '-78.875463', 200)
+      .subscribe(data => {
+        console.log(data);
+      });
   }
 
   onSubmit() {
