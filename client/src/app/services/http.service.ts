@@ -21,12 +21,13 @@ export class HTTPService {
     >;
   }
 
-  getMapResultData(lat: string, lng: string, rad: number) {
+  getMapResultData(lat: string, lng: string, rad: number, businessType: string) {
     let params = new HttpParams();
 
     params = params.set('lat', lat);
     params = params.set('lng', lng);
     params = params.set('rad', rad.toString());
+    params = params.set('businessType', businessType);
 
     this.crimeData = this.http.get(this.apiUrl + '/crimes', {
       params: params

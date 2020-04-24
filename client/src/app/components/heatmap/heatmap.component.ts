@@ -27,9 +27,16 @@ export class HeatMapComponent implements OnInit {
 
     this.httpService.crimeData.pipe(take(1)).subscribe(crimeData => {
       console.log('crimeData: ', crimeData);
+      let crimeMapData = [];
+      crimeData.forEach(crime => {
+        let coords = {
+          location: new google.maps.LatLng(crime.lat, crime.lng)
+        };
+        crimeMapData.push(coords);
+      });
       this.crimeHeatMap = new google.maps.visualization.HeatmapLayer({
         map: this.map,
-        data: crimeData,
+        data: crimeMapData,
         // gradient: [
         //   'rgba(0, 0, 0, 0)',
         //   'rgba(0, 255, 0, 1)',
@@ -41,9 +48,16 @@ export class HeatMapComponent implements OnInit {
 
     this.httpService.businessData.pipe(take(1)).subscribe(businessData => {
       console.log('businessData: ', businessData);
+      let businessMapData = [];
+      businessData.forEach(business => {
+        let coords = {
+          location: new google.maps.LatLng(business.lat, business.lng)
+        };
+        businessMapData.push(coords);
+      });
       this.businessHeatMap = new google.maps.visualization.HeatmapLayer({
         map: this.map,
-        data: businessData,
+        data: businessMapData,
         gradient: [
           'rgba(0, 0, 0, 0)',
           'rgba(137, 196, 244, 1)',

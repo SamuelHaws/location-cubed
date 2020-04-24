@@ -38,8 +38,9 @@ def zones():
   centroids = [gpd.GeoSeries(zonePolygon).geometry.centroid for zonePolygon in zonesPolygons]
   
   # Convert centroid object to coords
-  centersCoords = [json.loads(centroid.to_json())['features'][0]['geometry']['coordinates'] for centroid in centroids]
-  return json.dumps(centersCoords)
+  centroidCoords = [{"lat": str(center[1]), "lng": str(center[0])} for center in [json.loads(centroid.to_json())['features'][0]['geometry']['coordinates'] for centroid in centroids]] 
+  
+  return json.dumps(centroidCoords)
 
 # Get crime incidents within search space that occurred since 2015
 @app.route('/crimes')
@@ -48,11 +49,13 @@ def crimes():
   lng = float(request.args.get('lng'))
   rad = float(request.args.get('rad'))
   adjustedRadius = rad / config.DEGREE_LAT_LENGTH
-
-  return json.dumps(openDataBuffalo.get(
+  
+  crimes = openDataBuffalo.get(
     "d6g9-xbgu",
     limit = '50000', 
-    where = "incident_datetime > '2015-01-01T00:00:00.000' AND latitude BETWEEN '"+ str(lat - adjustedRadius) + "' AND '" + str(lat + adjustedRadius) + "' AND longitude BETWEEN '" + str(lng - adjustedRadius) + "' AND '"+ str(lng + adjustedRadius) + "'"))
+    where = "incident_datetime > '2015-01-01T00:00:00.000' AND latitude BETWEEN '"+ str(lat - adjustedRadius) + "' AND '" + str(lat + adjustedRadius) + "' AND longitude BETWEEN '" + str(lng - adjustedRadius) + "' AND '"+ str(lng + adjustedRadius) + "'")
+
+  return json.dumps([{"lat": crime["latitude"], "lng": crime["longitude"]} for crime in crimes])
 
 # Get business license data for businesses of same type within search space
 @app.route('/businesses')
@@ -62,11 +65,14 @@ def businesses():
   rad = float(request.args.get('rad'))
   adjustedRadius = rad / config.DEGREE_LAT_LENGTH
   businessType = request.args.get('businessType')
-  
-  return json.dumps(openDataBuffalo.get(
+
+  businesses = openDataBuffalo.get(
     "qcyy-feh8", 
     descript = businessType, 
-    where = "licstatus='Active' AND latitude BETWEEN '"+ str(lat - adjustedRadius) + "' AND '" + str(lat + adjustedRadius) + "' AND longitude BETWEEN '" + str(lng - adjustedRadius) + "' AND '"+ str(lng + adjustedRadius) + "'"))
+    where = "licstatus='Active' AND latitude BETWEEN '"+ str(lat - adjustedRadius) + "' AND '" + str(lat + adjustedRadius) + "' AND longitude BETWEEN '" + str(lng - adjustedRadius) + "' AND '"+ str(lng + adjustedRadius) + "'")
+  
+
+  return json.dumps([{"lat": business["latitude"], "lng": business["longitude"]} for business in businesses])
 
 if __name__ == '__main__':
   app.run(debug=True)
