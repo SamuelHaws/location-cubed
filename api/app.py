@@ -13,8 +13,8 @@ openDataBuffalo = Socrata("data.buffalony.gov", config.APP_TOKEN)
 
 # Get the unique descripts for business licenses via Buffalo OpenData API
 @app.route('/businesstypes')
-def unique():
-  return json.dumps(openDataBuffalo.get("qcyy-feh8", content_type="json", select="distinct(descript)"))
+def businessTypes():
+  return json.dumps(openDataBuffalo.get("qcyy-feh8", select="distinct(descript)"))
 
 # Get coords of centers of commercial zones within search space
 @app.route('/zones')
@@ -72,8 +72,18 @@ def businesses():
     limit = 60000,
     where = "licstatus='Active' AND latitude BETWEEN '"+ str(lat - adjustedRadius) + "' AND '" + str(lat + adjustedRadius) + "' AND longitude BETWEEN '" + str(lng - adjustedRadius) + "' AND '"+ str(lng + adjustedRadius) + "'")
   
-
   return json.dumps([{"lat": business["latitude"], "lng": business["longitude"]} for business in businesses])
+
+@app.route('/traffic')
+def traffic():
+  lat = request.args.get('lat')
+  lng = request.args.get('lng')
+  rad = request.args.get('rad')
+
+  whereClause = "within_circle(location_1," + lat + "," + lng + "," + rad + ") AND aadt_year > '2015-01-01T00:00:00.000'"
+
+  return json.dumps([{"lat": traffic['location_1']['latitude'], "lng": traffic['location_1']['longitude'], "aadt": traffic['aadt']} for traffic in openDataBuffalo.get("y93c-u65y", where=whereClause)])
+  
 
 if __name__ == '__main__':
   app.run(debug=True)
