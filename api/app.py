@@ -29,7 +29,7 @@ def zones():
   whereClause = "within_circle(the_geom," + lat + "," + lng + "," + rad + ") AND plctypfut3 IN (" + str(commercialZoneCodes).strip('[]') + ")"
 
   # Fetch zone data
-  zones = openDataBuffalo.get("4eg6-xiba", limit=200, content_type="json", where=whereClause)
+  zones = openDataBuffalo.get("4eg6-xiba", limit=60000, content_type="json", where=whereClause)
 
   # Generate polygons of zones
   zonesPolygons = [Polygon(zone['the_geom']['coordinates'][0][0]) for zone in zones]
@@ -37,7 +37,7 @@ def zones():
   # Get coords of centers of zones
   centroids = [gpd.GeoSeries(zonePolygon).geometry.centroid for zonePolygon in zonesPolygons]
   
-  # Convert centroid object to coords
+  # Convert centroid objects to coords
   centroidCoords = [{"lat": str(center[1]), "lng": str(center[0])} for center in [json.loads(centroid.to_json())['features'][0]['geometry']['coordinates'] for centroid in centroids]] 
   
   return json.dumps(centroidCoords)
@@ -52,7 +52,7 @@ def crimes():
   
   crimes = openDataBuffalo.get(
     "d6g9-xbgu",
-    limit = '50000', 
+    limit = '60000', 
     where = "incident_datetime > '2015-01-01T00:00:00.000' AND latitude BETWEEN '"+ str(lat - adjustedRadius) + "' AND '" + str(lat + adjustedRadius) + "' AND longitude BETWEEN '" + str(lng - adjustedRadius) + "' AND '"+ str(lng + adjustedRadius) + "'")
 
   return json.dumps([{"lat": crime["latitude"], "lng": crime["longitude"]} for crime in crimes])
@@ -69,6 +69,7 @@ def businesses():
   businesses = openDataBuffalo.get(
     "qcyy-feh8", 
     descript = businessType, 
+    limit = 60000,
     where = "licstatus='Active' AND latitude BETWEEN '"+ str(lat - adjustedRadius) + "' AND '" + str(lat + adjustedRadius) + "' AND longitude BETWEEN '" + str(lng - adjustedRadius) + "' AND '"+ str(lng + adjustedRadius) + "'")
   
 

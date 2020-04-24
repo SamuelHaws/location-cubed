@@ -49,6 +49,7 @@ export class DashboardComponent implements OnInit {
   }
 
   onSubmit() {
+    this.mapService.rad = this.rad;
     this.httpService.getMapResultData(
       this.lat,
       this.lng,

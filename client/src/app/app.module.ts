@@ -11,6 +11,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AgmCoreModule } from '@agm/core';
 import { MarkerMapComponent } from './components/markermap/markermap.component';
 import { HeatMapComponent } from './components/heatmap/heatmap.component';
+import { NgxSpinnerModule } from 'ngx-spinner';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -29,7 +31,9 @@ import { HeatMapComponent } from './components/heatmap/heatmap.component';
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyBLT-P4ecWpHBsk1OMVPgJftjqf5G6klSQ&libaries',
       libraries: ['visualization']
-    })
+    }),
+    NgxSpinnerModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
