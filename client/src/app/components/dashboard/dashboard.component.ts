@@ -48,9 +48,9 @@ export class DashboardComponent implements OnInit {
     }
 
     this.httpService
-      .getZoneData('42.893545', '-78.875463', 200)
-      .subscribe(data => {
-        console.log(data);
+      .getCommercialZones(this.lat, this.lng, this.rad)
+      .subscribe(zones => {
+        console.log(zones);
       });
   }
 

@@ -17,7 +17,7 @@ export class HTTPService {
     >;
   }
 
-  getZoneData(lat: string, lng: string, rad: number): Observable<any> {
+  getCommercialZones(lat: string, lng: string, rad: number): Observable<any> {
     let params = new HttpParams();
 
     params = params.set('lat', lat);

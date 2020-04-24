@@ -1,13 +1,11 @@
-from flask import Flask, request
-from sodapy import Socrata
-from flask_cors import CORS
+import engine
 import config
 import json
 import requests
-import engine
-
-#TODO: Remove these imports, fix /zones code
-from shapely.geometry import Point, Polygon
+from flask import Flask, request
+from sodapy import Socrata
+from flask_cors import CORS
+from shapely.geometry import Polygon
 import geopandas as gpd
 
 app = Flask(__name__)
@@ -18,12 +16,6 @@ openDataBuffalo = Socrata("data.buffalony.gov", config.APP_TOKEN)
 @app.route('/businesstypes')
 def unique():
   return json.dumps(openDataBuffalo.get("qcyy-feh8", content_type="json", select="distinct(descript)"))
-
-
-  # if(codetocheck in commercialzonecodes):
-  #     return True
-  # else:
-  #     return False
 
 # Get coords of centers of commercial zones within search space
 @app.route('/zones')
@@ -41,25 +33,41 @@ def zones():
   zones = openDataBuffalo.get("4eg6-xiba", limit=200, content_type="json", where=whereClause)
 
   # Generate polygons of zones
-  zonesPolygons = [zone['the_geom']['coordinates'][0][0] for zone in zones]
+  zonesPolygons = [Polygon(zone['the_geom']['coordinates'][0][0]) for zone in zones]
 
   # Get coords of centers of zones
-  centroids = []
-  for zonePolygon in zonesPolygons:
-    polygon = Polygon(zonePolygon)
-    centroids.append(gpd.GeoSeries(polygon).geometry.centroid) # Store centroid of zone polygon
+  centroids = [gpd.GeoSeries(zonePolygon).geometry.centroid for zonePolygon in zonesPolygons]
   
   # Convert centroid object to coords
   centersCoords = [json.loads(centroid.to_json())['features'][0]['geometry']['coordinates'] for centroid in centroids]
   return json.dumps(centersCoords)
 
-@app.route('/scores')
-def scores():
-  lat = request.args.get('lat')
-  lng = request.args.get('lng')
-  rad = request.args.get('rad')
+# Get crime incidents within search space that occurred since 2015
+@app.route('/crimes')
+def crimes():
+  lat = float(request.args.get('lat'))
+  lng = float(request.args.get('lng'))
+  rad = float(request.args.get('rad'))
+  adjustedRadius = rad / config.DEGREE_LAT_LENGTH
+
+  return json.dumps(openDataBuffalo.get(
+    "d6g9-xbgu",
+    limit = '50000', 
+    where = "incident_datetime > '2015-01-01T00:00:00.000' AND latitude BETWEEN '"+ str(lat - adjustedRadius) + "' AND '" + str(lat + adjustedRadius) + "' AND longitude BETWEEN '" + str(lng - adjustedRadius) + "' AND '"+ str(lng + adjustedRadius) + "'"))
+
+# Get business license data for businesses of same type within search space
+@app.route('/businesses')
+def businesses():
+  lat = float(request.args.get('lat'))
+  lng = float(request.args.get('lng'))
+  rad = float(request.args.get('rad'))
+  adjustedRadius = rad / config.DEGREE_LAT_LENGTH
   businessType = request.args.get('businessType')
-  return json.dumps(engine.generateScoresFromCoords(lat, lng, rad, businessType))
+  
+  return json.dumps(openDataBuffalo.get(
+    "qcyy-feh8", 
+    descript = businessType, 
+    where = "licstatus='Active' AND latitude BETWEEN '"+ str(lat - adjustedRadius) + "' AND '" + str(lat + adjustedRadius) + "' AND longitude BETWEEN '" + str(lng - adjustedRadius) + "' AND '"+ str(lng + adjustedRadius) + "'"))
 
 if __name__ == '__main__':
   app.run(debug=True)
