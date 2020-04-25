@@ -1,74 +1,89 @@
-from flask import Flask, request
-from sodapy import Socrata
-from flask_cors import CORS
 import config
 import json
 import requests
-import engine
+from flask import Flask, request
+from sodapy import Socrata
+from flask_cors import CORS
+from shapely.geometry import Polygon
+import geopandas as gpd
 
 app = Flask(__name__)
 CORS(app)
-
-client = Socrata("data.buffalony.gov", config.APP_TOKEN)
-
-@app.route('/crimedata')
-def test():
-  return json.dumps(client.get("d6g9-xbgu", limit=200, content_type="json"))
+openDataBuffalo = Socrata("data.buffalony.gov", config.APP_TOKEN)
 
 # Get the unique descripts for business licenses via Buffalo OpenData API
 @app.route('/businesstypes')
-def unique():
-  return json.dumps(client.get("qcyy-feh8", limit=200, content_type="json", select="distinct(descript)"))
+def businessTypes():
+  return json.dumps(openDataBuffalo.get("qcyy-feh8", select="distinct(descript)"))
 
-@app.route('/getscoresbyaddresses')
-def getscoresbyaddresses():
-  addresses = json.loads(request.args.get('addresses', type = str))
-  businessType = request.args.get('businessType', type = str)
-  radius = request.args.get('rad')
-  return json.dumps(engine.generatescoresfromaddresses(addresses, businessType, radius))
-
-# Get a list of places within a radius based on coords via Google Places API
-@app.route('/places')
-def places():
+# Get coords of centers of commercial zones within search space
+@app.route('/zones')
+def zones():
   lat = request.args.get('lat')
   lng = request.args.get('lng')
   rad = request.args.get('rad')
-  return internalPlacesCall(lat, lng, rad)
 
-def internalPlacesCall(lat, lng, rad):
-  url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=" + config.GOOGLE_API_KEY + "&location=" + lat + "," + lng + "&radius=" + rad
-  return requests.get(url).json()
+  commercialZoneCodes = ["N-1C","N-1D","N-2C","N-2E","N-3C","N-3E","D-S","D-C"]
 
-# Takes a latitude, longitude, radius, and business type and gives a list of addresses and there scores.
-@app.route('/getscoresbycoordinate')
-def getscoresbycoordinate():
+  # Restrict results to commercial zones within search space
+  whereClause = "within_circle(the_geom," + lat + "," + lng + "," + rad + ") AND plctypfut3 IN (" + str(commercialZoneCodes).strip('[]') + ")"
+
+  # Fetch zone data
+  zones = openDataBuffalo.get("4eg6-xiba", limit=60000, content_type="json", where=whereClause)
+
+  # Generate polygons of zones
+  zonesPolygons = [Polygon(zone['the_geom']['coordinates'][0][0]) for zone in zones]
+
+  # Get coords of centers of zones
+  centroids = [gpd.GeoSeries(zonePolygon).geometry.centroid for zonePolygon in zonesPolygons]
+  
+  # Convert centroid objects to coords
+  centroidCoords = [{"lat": str(center[1]), "lng": str(center[0])} for center in [json.loads(centroid.to_json())['features'][0]['geometry']['coordinates'] for centroid in centroids]] 
+  
+  return json.dumps(centroidCoords)
+
+# Get crime incidents within search space that occurred since 2015
+@app.route('/crimes')
+def crimes():
+  lat = float(request.args.get('lat'))
+  lng = float(request.args.get('lng'))
+  rad = float(request.args.get('rad'))
+  adjustedRadius = rad / config.DEGREE_LAT_LENGTH
+  
+  crimes = openDataBuffalo.get(
+    "d6g9-xbgu",
+    limit = '60000', 
+    where = "incident_datetime > '2015-01-01T00:00:00.000' AND latitude BETWEEN '"+ str(lat - adjustedRadius) + "' AND '" + str(lat + adjustedRadius) + "' AND longitude BETWEEN '" + str(lng - adjustedRadius) + "' AND '"+ str(lng + adjustedRadius) + "'")
+
+  return json.dumps([{"lat": crime["latitude"], "lng": crime["longitude"]} for crime in crimes])
+
+# Get business license data for businesses of same type within search space
+@app.route('/businesses')
+def businesses():
+  lat = float(request.args.get('lat'))
+  lng = float(request.args.get('lng'))
+  rad = float(request.args.get('rad'))
+  adjustedRadius = rad / config.DEGREE_LAT_LENGTH
+  businessType = request.args.get('businessType')
+
+  businesses = openDataBuffalo.get(
+    "qcyy-feh8", 
+    descript = businessType, 
+    limit = 60000,
+    where = "licstatus='Active' AND latitude BETWEEN '"+ str(lat - adjustedRadius) + "' AND '" + str(lat + adjustedRadius) + "' AND longitude BETWEEN '" + str(lng - adjustedRadius) + "' AND '"+ str(lng + adjustedRadius) + "'")
+  
+  return json.dumps([{"lat": business["latitude"], "lng": business["longitude"]} for business in businesses])
+
+@app.route('/traffic')
+def traffic():
   lat = request.args.get('lat')
   lng = request.args.get('lng')
-  businessType = request.args.get('businessType', type = str)
-  radius = request.args.get('rad')
-  mapInfo = internalPlacesCall(lat, lng, radius)['results']
-  sendable = []
+  rad = request.args.get('rad')
 
-  # builds the addresses to send to the engine.
-  for location in mapInfo:
-    addressParts = location['vicinity'].split(" ")
-    i = 0
-    while i < len(addressParts):
-      try: 
-        currentAddress = {
-          "housenumber": int(addressParts[i]),
-          "street": addressParts[i+1],
-          "lat": location['geometry']['location']['lat'],
-          "lng": location['geometry']['location']['lng']
-        }
-        sendable.append(currentAddress)
-        i+=1000
-      except ValueError:
-        i+=1
+  whereClause = "within_circle(location_1," + lat + "," + lng + "," + rad + ") AND aadt_year > '2015-01-01T00:00:00.000'"
+
+  return json.dumps([{"lat": traffic['location_1']['latitude'], "lng": traffic['location_1']['longitude'], "aadt": traffic['aadt']} for traffic in openDataBuffalo.get("y93c-u65y", where=whereClause)])
   
-  # Send address objects from Places API to engine
-  return json.dumps(engine.generatescoresfromaddresses(sendable, businessType, (float(radius) / 111090.58224106459)))
-
 
 if __name__ == '__main__':
   app.run(debug=True)

@@ -9,7 +9,7 @@
           <div class="form-group">
             <label for="business">Select your business type:</label>
             <select class="form-control" name="businessType" [(ngModel)]="businessType">
-              <option value="">Choose a Business</option>
+              <option value=""></option>
               <option *ngFor="let businessType of businessTypes" [value]="businessType">{{ businessType }}</option>
             </select>
           </div>
@@ -25,11 +25,11 @@
             <input type="number" class="form-control" placeholder="Longitude" name="lng" [(ngModel)]="lng">
           </div>
           <div class="form-group">
-            <label for="radius">Radius:</label>
-            <input type="number" class="form-control" placeholder="Radius" name="radius" [(ngModel)]="radius">
+            <label for="rad">Radius (meters):</label>
+            <input type="number" class="form-control" placeholder="Radius" name="rad" [(ngModel)]="rad">
           </div>
           <button class="btn btn-primary" type="submit"
-            [disabled]="!businessType || lat == '' || lng == '' || !radius">Submit</button>
+            [disabled]="!businessType || lat == '' || lng == '' || !rad">Submit</button>
         </form>
       </div>
     </div>

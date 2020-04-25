@@ -1,3 +1,48 @@
-<agm-map [latitude]="latitude" [longitude]="longitude" [mapTypeId]="mapType" [zoom]="zoom"
+<ngx-spinner *ngIf="!(isCrimeDataLoaded && isBusinessDataLoaded && isZoneDataLoaded && isTrafficDataLoaded)"
+  bdColor="rgba(0, 0, 0, 0.8)" size="medium" color="#fff" type="square-jelly-box" [fullScreen]="true">
+  <p style="color: white"> Fetching Data... </p>
+</ngx-spinner>
+
+<div *ngIf="isCrimeDataLoaded && isBusinessDataLoaded && isZoneDataLoaded && isTrafficDataLoaded"
+  class="card map-overlay" id="back-overlay">
+  <div class="card-body text-center p-1 ">
+    <button type="button" class="btn btn-primary m-1" (click)="back()">
+      <div class="d-flex justify-content-between align-items-center text-center">
+        <i class="fas fa-arrow-left"></i>
+        <p class="mb-0">Back to
+          Search</p>
+      </div>
+    </button>
+  </div>
+</div>
+
+<div *ngIf="isCrimeDataLoaded && isBusinessDataLoaded && isZoneDataLoaded && isTrafficDataLoaded"
+  class="card map-overlay" id="legend-overlay">
+  <div class="card-body p-2">
+    <h5 class="card-title">Legend</h5>
+    <div class="d-flex flex-column">
+      <div class="d-flex align-items-center">
+        <input type="checkbox" name="crimesCheckbox" id="crimesCheckbox" checked (click)="toggleCrimeHeatmap()">
+        <label class="pl-2 mb-0" for="crimesCheckbox">Crime Incidents</label>
+      </div>
+      <div class="d-flex align-items-center">
+        <input type="checkbox" name="businessesCheckbox" id="businessesCheckbox" checked
+          (click)="toggleBusinessHeatmap()">
+        <label class="pl-2 mb-0" for="businessesCheckbox">Competitor Businesses</label>
+      </div>
+      <div class="d-flex align-items-center">
+        <input type="checkbox" name="zoningCheckbox" id="zoningCheckbox" checked (click)="toggleZoneHeatmap()">
+        <label class="pl-2 mb-0" for="zoningCheckbox">Commercial Zones</label>
+      </div>
+      <div class="d-flex align-items-center">
+        <input type="checkbox" name="trafficCheckbox" id="trafficCheckbox" checked (click)="toggleTrafficHeatmap()">
+        <label class="pl-2 mb-0" for="trafficCheckbox">Traffic</label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<agm-map *ngIf="isCrimeDataLoaded && isBusinessDataLoaded && isZoneDataLoaded && isTrafficDataLoaded"
+  [latitude]="latitude" [longitude]="longitude" [mapTypeId]="mapType" [zoom]="zoom" [maxZoom]="maxZoom"
   (mapReady)="onMapLoad($event)">
 </agm-map>

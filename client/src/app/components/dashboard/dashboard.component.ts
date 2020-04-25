@@ -1,10 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HTTPService } from 'src/app/services/http.service';
-import { BusinessType } from 'src/app/models/BusinessType';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
-import { AgmCoreModule } from '@agm/core';
 import { take } from 'rxjs/operators';
 import { MapService } from 'src/app/services/map.service';
 
@@ -16,13 +12,12 @@ import { MapService } from 'src/app/services/map.service';
 export class DashboardComponent implements OnInit {
   // All business Types that exist in the OpenData Business License dataset
   businessTypes: string[] = [];
-  businessTypeFormGroup: FormGroup;
   // User's chosen business type, as a string (to be used as HTTP param)
   businessType: string;
   lat: string = '';
   lng: string = '';
   // radius to look for places from (lat,lng) in meters
-  radius: number;
+  rad: number;
 
   constructor(
     private httpService: HTTPService,
@@ -41,7 +36,7 @@ export class DashboardComponent implements OnInit {
       });
 
     this.businessType = this.mapService.businessType;
-    this.radius = this.mapService.radius;
+    this.rad = this.mapService.rad;
 
     if (this.mapService.marker) {
       this.lat = this.mapService.marker.lat.toString();
@@ -50,18 +45,19 @@ export class DashboardComponent implements OnInit {
   }
 
   onSubmit() {
-    this.httpService
-      .getScoresByCoordinate(this.businessType, this.lat, this.lng, this.radius)
-      .pipe(take(1))
-      .subscribe(scores => {
-        console.log(scores);
-        this.mapService.scores = scores;
-        this.router.navigate(['/heatmap']);
-      });
+    this.mapService.rad = this.rad;
+    this.httpService.getMapResultData(
+      this.lat,
+      this.lng,
+      this.rad,
+      this.businessType
+    );
+    this.router.navigate(['/heatmap']);
   }
+
   loadMap() {
     this.mapService.businessType = this.businessType;
-    this.mapService.radius = this.radius;
+    this.mapService.rad = this.rad;
     this.router.navigate(['/markermap']);
   }
 }

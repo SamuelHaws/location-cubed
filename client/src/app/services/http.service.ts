@@ -9,6 +9,11 @@ import { BusinessType } from '../models/BusinessType';
 export class HTTPService {
   apiUrl = 'http://localhost:5000';
 
+  crimeData: Observable<any>;
+  businessData: Observable<any>;
+  zoneData: Observable<any>;
+  trafficData: Observable<any>;
+
   constructor(private http: HttpClient) {}
 
   getUniqueBusinessTypes(): Observable<BusinessType[]> {
@@ -17,54 +22,29 @@ export class HTTPService {
     >;
   }
 
-  getPlaces(
-    businessType: string,
+  getMapResultData(
     lat: string,
     lng: string,
-    radius: number
-  ): Observable<any> {
+    rad: number,
+    businessType: string
+  ) {
     let params = new HttpParams();
 
-    params = params.set('businessType', businessType);
     params = params.set('lat', lat);
     params = params.set('lng', lng);
-    params = params.set('rad', radius.toString());
-
-    return this.http.get(this.apiUrl + '/places', { params: params });
-  }
-
-  getScoreByAddress(
-    addresses: string,
-    businessType: string,
-    radius: string
-  ): Observable<any> {
-    let params = new HttpParams();
-
-    params = params.set('addresses', addresses);
+    params = params.set('rad', rad.toString());
     params = params.set('businessType', businessType);
-    params = params.set('rad', radius.toString());
 
-    return this.http.get(this.apiUrl + '/getscorebyaddress', {
+    this.crimeData = this.http.get(this.apiUrl + '/crimes', {
       params: params
     });
-  }
-
-  getScoresByCoordinate(
-    businessType: string,
-    lat: string,
-    lng: string,
-    radius: number
-  ): Observable<any> {
-    let params = new HttpParams();
-
-    console.log(radius);
-
-    params = params.set('businessType', businessType);
-    params = params.set('lat', lat);
-    params = params.set('lng', lng);
-    params = params.set('rad', radius.toString());
-
-    return this.http.get(this.apiUrl + '/getscoresbycoordinate', {
+    this.businessData = this.http.get(this.apiUrl + '/businesses', {
+      params: params
+    });
+    this.zoneData = this.http.get(this.apiUrl + '/zones', {
+      params: params
+    });
+    this.trafficData = this.http.get(this.apiUrl + '/traffic', {
       params: params
     });
   }
