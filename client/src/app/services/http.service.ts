@@ -12,6 +12,7 @@ export class HTTPService {
   crimeData: Observable<any>;
   businessData: Observable<any>;
   zoneData: Observable<any>;
+  trafficData: Observable<any>;
 
   constructor(private http: HttpClient) {}
 
@@ -21,7 +22,12 @@ export class HTTPService {
     >;
   }
 
-  getMapResultData(lat: string, lng: string, rad: number, businessType: string) {
+  getMapResultData(
+    lat: string,
+    lng: string,
+    rad: number,
+    businessType: string
+  ) {
     let params = new HttpParams();
 
     params = params.set('lat', lat);
@@ -36,6 +42,9 @@ export class HTTPService {
       params: params
     });
     this.zoneData = this.http.get(this.apiUrl + '/zones', {
+      params: params
+    });
+    this.trafficData = this.http.get(this.apiUrl + '/traffic', {
       params: params
     });
   }

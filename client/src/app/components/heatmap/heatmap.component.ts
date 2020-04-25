@@ -13,21 +13,24 @@ export class HeatMapComponent implements OnInit {
   latitude = 42.890981;
   longitude = -78.872579;
   mapType = 'roadmap';
-  zoom = 12;
-  maxZoom = 16;
+  zoom = 14;
+  maxZoom = 17;
 
   private map: google.maps.Map = null;
   private crimeHeatMap: google.maps.visualization.HeatmapLayer = null;
   private businessHeatMap: google.maps.visualization.HeatmapLayer = null;
   private zoneHeatMap: google.maps.visualization.HeatmapLayer = null;
+  private trafficHeatMap: google.maps.visualization.HeatmapLayer = null;
 
   isCrimeDataLoaded: boolean;
   isBusinessDataLoaded: boolean;
   isZoneDataLoaded: boolean;
+  isTrafficDataLoaded: boolean;
 
   crimeMapData = [];
   businessMapData = [];
   zoneMapData = [];
+  trafficMapData = [];
 
   constructor(
     private router: Router,
@@ -70,6 +73,18 @@ export class HeatMapComponent implements OnInit {
         this.zoneMapData.push(coords);
       });
     });
+
+    this.httpService.trafficData.pipe(take(1)).subscribe(trafficData => {
+      this.isTrafficDataLoaded = true;
+      console.log('trafficData: ', trafficData);
+      trafficData.forEach(traffic => {
+        let coords = {
+          location: new google.maps.LatLng(traffic.lat, traffic.lng),
+          weight: traffic.aadt
+        };
+        this.trafficMapData.push(coords);
+      });
+    });
   }
 
   onMapLoad(mapInstance: google.maps.Map) {
@@ -96,12 +111,16 @@ export class HeatMapComponent implements OnInit {
     this.zoneHeatMap = new google.maps.visualization.HeatmapLayer({
       map: this.map,
       data: this.zoneMapData,
-      gradient: ['rgba(0, 0, 0, 0)', 'rgba(137,250,147, 0.75)'],
-      radius: 70
+      gradient: ['rgba(0, 0, 0, 0)', 'rgba(216,103,224, 0.5)'],
+      radius: 60
     });
 
-    this.httpService.zoneData.pipe(take(1)).subscribe(zoneData => {
-      console.log('zoneData', zoneData);
+    this.trafficHeatMap = new google.maps.visualization.HeatmapLayer({
+      map: this.map,
+      data: this.trafficMapData,
+      gradient: ['rgba(0, 0, 0, 0)', 'rgba(137,250,147, 1)'],
+      radius: 100,
+      opacity: 0.9
     });
   }
 
@@ -121,6 +140,12 @@ export class HeatMapComponent implements OnInit {
     if (this.zoneHeatMap.getData().getLength() > 0)
       this.zoneHeatMap.setData([]);
     else this.zoneHeatMap.setData(this.zoneMapData);
+  }
+
+  toggleTrafficHeatmap() {
+    if (this.trafficHeatMap.getData().getLength() > 0)
+      this.trafficHeatMap.setData([]);
+    else this.trafficHeatMap.setData(this.trafficMapData);
   }
 
   back() {
