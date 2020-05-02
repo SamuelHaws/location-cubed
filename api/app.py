@@ -7,6 +7,10 @@ from flask_cors import CORS
 from shapely.geometry import Polygon
 import geopandas as gpd
 
+# length of a degree of latitude in meters for Buffalo
+# http://www.csgnetwork.com/degreelenllavcalc.html
+DEGREE_LAT_LENGTH = 111090.58224106459
+
 app = Flask(__name__)
 CORS(app)
 openDataBuffalo = Socrata("data.buffalony.gov", config.APP_TOKEN)
@@ -48,7 +52,7 @@ def crimes():
   lat = float(request.args.get('lat'))
   lng = float(request.args.get('lng'))
   rad = float(request.args.get('rad'))
-  adjustedRadius = rad / config.DEGREE_LAT_LENGTH
+  adjustedRadius = rad / DEGREE_LAT_LENGTH
   
   crimes = openDataBuffalo.get(
     "d6g9-xbgu",
@@ -63,7 +67,7 @@ def businesses():
   lat = float(request.args.get('lat'))
   lng = float(request.args.get('lng'))
   rad = float(request.args.get('rad'))
-  adjustedRadius = rad / config.DEGREE_LAT_LENGTH
+  adjustedRadius = rad / DEGREE_LAT_LENGTH
   businessType = request.args.get('businessType')
 
   businesses = openDataBuffalo.get(
@@ -74,6 +78,7 @@ def businesses():
   
   return json.dumps([{"lat": business["latitude"], "lng": business["longitude"]} for business in businesses])
 
+# Get annual average daily traffic data within search space since 2015
 @app.route('/traffic')
 def traffic():
   lat = request.args.get('lat')
@@ -84,6 +89,6 @@ def traffic():
 
   return json.dumps([{"lat": traffic['location_1']['latitude'], "lng": traffic['location_1']['longitude'], "aadt": traffic['aadt']} for traffic in openDataBuffalo.get("y93c-u65y", where=whereClause)])
   
-
+# See https://stackoverflow.com/a/30329547, important to note that API is still accessible at localhost:5000
 if __name__ == '__main__':
-  app.run(debug=True)
+  app.run(host='0.0.0.0', debug=True)
